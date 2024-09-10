@@ -61,7 +61,8 @@ class PodcastActivity : AppCompatActivity(),
         setupToolbar()
         setupViewModels()
         updateControls()
-
+        createSubscription()
+        handleIntent(intent)
         addBackStackListener()
 
     }
