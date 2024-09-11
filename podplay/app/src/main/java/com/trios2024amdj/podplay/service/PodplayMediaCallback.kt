@@ -24,6 +24,14 @@ class PodplayMediaCallback(
 
     private var focusRequest: AudioFocusRequest? = null
 
+    interface PodplayMediaListener {
+        fun onStateChanged()
+        fun onStopPlaying()
+        fun onPausePlaying()
+    }
+
+    var listener: PodplayMediaListener? = null
+
     override fun onPlayFromUri(uri: Uri?, extras: Bundle?) {
         super.onPlayFromUri(uri, extras)
         println("Playing ${uri.toString()}")
@@ -66,6 +74,12 @@ class PodplayMediaCallback(
         var position: Long = -1
         mediaPlayer?.let {
             position = it.currentPosition.toLong()
+
+            if (state == PlaybackStateCompat.STATE_PAUSED ||
+                state == PlaybackStateCompat.STATE_PLAYING) {
+                listener?.onStateChanged()
+            }
+
         }
 
         val playbackState = PlaybackStateCompat.Builder()
@@ -149,10 +163,20 @@ class PodplayMediaCallback(
                     mediaPlayer.reset()
                     mediaPlayer.setDataSource(context, mediaUri)
                     mediaPlayer.prepare()
-                    mediaSession.setMetadata(MediaMetadataCompat.Builder()
-                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI,
-                            mediaUri.toString())
-                        .build())
+                    mediaExtras?.let { mediaExtras ->
+                        mediaSession.setMetadata(MediaMetadataCompat.Builder()
+                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE,
+                                mediaExtras.getString(
+                                    MediaMetadataCompat.METADATA_KEY_TITLE))
+                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST,
+                                mediaExtras.getString(
+                                    MediaMetadataCompat.METADATA_KEY_ARTIST))
+                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
+                                mediaExtras.getString(
+                                    MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI))
+                            .build())
+                    }
+
                 }
             }
         }
@@ -175,6 +199,8 @@ class PodplayMediaCallback(
                 setState(PlaybackStateCompat.STATE_PAUSED)
             }
         }
+        listener?.onPausePlaying()
+
     }
 
     private fun stopPlaying() {
@@ -186,6 +212,8 @@ class PodplayMediaCallback(
                 setState(PlaybackStateCompat.STATE_STOPPED)
             }
         }
+        listener?.onStopPlaying()
+
     }
 
 
