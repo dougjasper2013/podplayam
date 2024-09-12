@@ -188,14 +188,14 @@ class PodcastDetailsFragment : Fragment(), EpisodeListAdapter.EpisodeListAdapter
     private fun startPlaying(episodeViewData: PodcastViewModel.EpisodeViewData) {
         val fragmentActivity = activity as FragmentActivity
         val controller = MediaControllerCompat.getMediaController(fragmentActivity)
-        val viewData = podcastViewModel.activePodcastViewData ?: return
+//        val viewData = podcastViewModel.activePodcastViewData ?: return
         val bundle = Bundle()
         bundle.putString(MediaMetadataCompat.METADATA_KEY_TITLE,
             episodeViewData.title)
         bundle.putString(MediaMetadataCompat.METADATA_KEY_ARTIST,
-            viewData.feedTitle)
+            "An Amazing Artist")
         bundle.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
-            viewData.imageUrl)
+          "https://img.freepik.com/free-vector/collection-neon-podcast-logos-template_23-2148758081.jpg")
 
         controller.transportControls.playFromUri(
             Uri.parse(episodeViewData.mediaUrl), bundle)
